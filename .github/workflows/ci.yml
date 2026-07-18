@@ -1,0 +1,43 @@
+# Pipeline de Integración Continua (CI)
+# Se ejecuta en cada push o pull request hacia la rama main:
+#   1. Compila los 4 microservicios
+#   2. Ejecuta las pruebas unitarias (con cobertura JaCoCo)
+#   3. Envía el análisis de calidad a SonarQube/SonarCloud
+name: CI - Build, Test y SonarQube
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+        with:
+          # Sonar necesita el historial completo para el análisis de "código nuevo"
+          fetch-depth: 0
+
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Compilar y ejecutar pruebas
+        run: mvn -B verify
+
+      - name: Análisis SonarQube
+        # Requiere el secret SONAR_TOKEN configurado en:
+        # GitHub repo -> Settings -> Secrets and variables -> Actions
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          mvn -B sonar:sonar
+          -Dsonar.projectKey=TU_PROJECT_KEY
+          -Dsonar.organization=TU_ORGANIZACION
+          -Dsonar.host.url=https://sonarcloud.io

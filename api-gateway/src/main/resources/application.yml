@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            # lb:// = balanceo de carga usando las instancias registradas en Eureka
+            - id: productos
+              uri: lb://SERVICIO-PRODUCTOS
+              predicates:
+                - Path=/api/productos/**
+            - id: pedidos
+              uri: lb://SERVICIO-PEDIDOS
+              predicates:
+                - Path=/api/pedidos/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
