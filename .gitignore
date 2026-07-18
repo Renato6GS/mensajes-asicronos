@@ -9,7 +9,3 @@ target/
 .settings/
 .project
 .classpath
-
-# SonarQube local (nunca subir tokens reales)
-sonar-project.properties
-.scannerwork/
